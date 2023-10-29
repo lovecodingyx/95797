@@ -1,0 +1,7 @@
+bike_data: 4780363 rows
+central_park_weather: 2984 rows
+fhv_bases: 1098 rows
+fhv_tripdata: 3008649 rows
+fhvhv_tripdata: 32182272 rows
+green_tripdata: 238718 rows
+yellow_tripdata: 5454972 rows
