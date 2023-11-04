@@ -1,11 +1,24 @@
+#!/usr/bin/env python
 import duckdb
+import sys
 
-conn = duckdb.connect('main.db')
+raw_tables = [
+    "central_park_weather",
+    "fhv_bases",
+    "fhv_tripdata",
+    "fhvhv_tripdata",
+    "green_tripdata",
+    "yellow_tripdata",
+    "bike_data",
+]
 
-tableNames = conn.execute("SELECT table_name FROM information_schema.tables ORDER BY table_name;").fetchall()
-for table in tableNames:
-    row_count = conn.execute(f"SELECT COUNT(*) FROM {table[0]}").fetchone()[0]
-    print(f"{table[0]}: {row_count} rows")
 
-conn.close()
+def main(conn):
+    for t in sorted(raw_tables):
+        rows = conn.sql(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
+        print(t, rows)
 
+
+if __name__ == "__main__":
+    with duckdb.connect(sys.argv[1]) as conn:
+        main(conn)
