@@ -4,25 +4,19 @@ with source as (
 
 ),
 
--- exclude SR_Flag since there is no value in this column
 renamed as (
-    
+
     select
-        dispatching_base_num,
+        trim(upper(dispatching_base_num)) as  dispatching_base_num, --some ids are lowercase
         pickup_datetime,
         dropoff_datetime,
-        pulocationID,
-        dolocationID,
-        -- drop sr_flag since the whole column is null
-        affiliated_base_number,
+        pulocationid,
+        dolocationid,
+        --sr_flag, always null so chuck it
+        trim(upper(affiliated_base_number)) as affiliated_base_number,
         filename
-    
-    from source
 
-    where
-        pickup_datetime <= '2022-12-31' 
-        AND 
-        dropOff_datetime <= '2022-12-31'  
+    from source
 
 )
 

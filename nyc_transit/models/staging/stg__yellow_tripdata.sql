@@ -10,10 +10,10 @@ renamed as (
         vendorid,
         tpep_pickup_datetime,
         tpep_dropoff_datetime,
-        passenger_count,
+        passenger_count::int as passenger_count,
         trip_distance,
         ratecodeid,
-        {{to_boolean("store_and_fwd_flag")}} as store_and_fwd_flag,
+        {{flag_to_bool("store_and_fwd_flag")}} as store_and_fwd_flag,
         pulocationid,
         dolocationid,
         payment_type,
@@ -29,10 +29,8 @@ renamed as (
         filename
 
     from source
-    where tpep_pickup_datetime <= '2022-12-31'
-    and tpep_dropoff_datetime <= '2022-12-31'
-    and trip_distance >= 0 
-
+        WHERE tpep_pickup_datetime < TIMESTAMP '2022-12-31' -- drop rows in the future
+          AND trip_distance >= 0 -- drop negative trip_distance
 )
 
 select * from renamed
