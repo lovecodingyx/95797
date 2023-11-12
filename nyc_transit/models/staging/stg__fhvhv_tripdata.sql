@@ -4,6 +4,7 @@ with source as (
 
 ),
 
+-- select the data and change them to the correct data type
 renamed as (
 
     select
@@ -26,6 +27,7 @@ renamed as (
         airport_fee,
         tips,
         driver_pay,
+        -- use the util function to convert the data into boolean
         {{flag_to_bool("shared_request_flag")}} as shared_request_flag,
         {{flag_to_bool("shared_match_flag")}} as shared_match_flag,
         {{flag_to_bool("access_a_ride_flag")}} as access_a_ride_flag,

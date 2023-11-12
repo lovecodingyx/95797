@@ -4,6 +4,7 @@ with source as (
 
 ),
 
+-- select the data and change them to the correct data type
 renamed as (
 
     select
@@ -41,10 +42,12 @@ renamed as (
 
 )
 
+-- Merge the data (union)
 select
 	coalesce(starttime, started_at)::timestamp as started_at_ts,
 	coalesce(stoptime, ended_at)::timestamp as ended_at_ts,
-	coalesce(tripduration::int,datediff('second', started_at_ts, ended_at_ts)) tripduration,
+    -- Convert the tripduration to type int
+	coalesce(tripduration,datediff('second', started_at_ts, ended_at_ts))::int as tripduration,
 	coalesce("start station id", start_station_id) as start_station_id,  
 	coalesce("start station name", start_station_name) as start_station_name,
 	coalesce("start station latitude", start_lat)::double as start_lat,

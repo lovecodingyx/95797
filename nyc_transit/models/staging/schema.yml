@@ -1,0 +1,445 @@
+models:
+  - name: stg__bike_data
+    description: "Bike information data"
+    columns:
+      - name: started_at_ts
+        description: "Trip start time"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: timestamp
+
+
+      - name: ended_at_ts
+        description: "Trip end time"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: timestamp
+
+      - name: tripduration
+        description: "Duration of trip(seconds)"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: integer
+
+      - name: start_station_id
+        description: "The id of start station"
+
+      - name: start_station_name
+        description: "The name of start station"
+
+      - name: start_lat
+        description: "The latitude of start station"
+
+      - name: start_lng
+        description: "The longtitude of start station"
+
+      - name: end_station_id
+        description: "The id of end station"
+
+      - name: end_station_name
+        description: "The name of end station"
+
+      - name: end_lat
+        description: "The latitude of end station"
+
+      - name: end_lng
+        description: "The longtitude of end station"
+
+      - name: filename
+        description: ""
+
+  - name: stg__central_park_weather
+    description: "Weather records in central park"
+    columns:
+      - name: date
+        description: "Date of the weather record"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: date
+
+
+      - name: awnd
+        description: "Average daily wind speed (meters per second or miles per hour as per user preference)"
+        tests:
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: double
+
+      - name: prcp
+        description: "Precipitation (mm or inches as per user preference, inches to hundredths on Daily Form pdf file)"
+        tests:
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: double
+        
+
+      - name: snow
+        description: "Snowfall (mm or inches as per user preference, inches to tenths on Daily Form pdf file)"
+        tests:
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: double
+
+      - name: snwd
+        description: "Snow depth (mm or inches as per user preference, inches on Daily Form pdf file)"
+        tests:
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: double
+
+      - name: tmax
+        description: "Maximum temperature (Fahrenheit or Celsius as per user preference)"
+        tests:
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: integer
+
+      - name: tmin
+        description: "Minimum temperature (Fahrenheit or Celsius as per user preference)"
+        tests:
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: integer
+
+      - name: filename
+        description: ""
+
+
+
+  - name: stg__fhv_bases
+    description: "FHV bases information in New York City"
+    columns:
+      - name: base_number
+        description: "The TLC license number of the dispatching base"
+        tests:
+              - unique
+              - dbt_expectations.expect_column_to_exist
+
+      - name: base_name
+        description: "The official name of the base entity"
+
+      - name: dba
+        description: "The “doing business as” name of the base"
+
+      - name: dba_category
+        description: ""
+
+      - name: filename
+        description: ""
+
+  - name: stg__fhv_tripdata
+    description: "FHV trip data in New York City"
+    columns:
+      - name: dispatching_base_num
+        description: "The TLC Base License Number of the base that dispatched the trip"
+        tests:
+        - relationships:
+            to: ref('staging','stg__fhv_bases')
+            field: base_number
+            config:
+              severity: warn
+            
+      - name: pickup_datetime
+        description: "The date and time of the trip pick-up"
+
+      - name: dropoff_datetime
+        description: "The date and time of the trip dropoff"
+
+      - name: pulocationid
+        description: "TLC Taxi Zone in which the trip began"
+
+      - name: dolocationid
+        description: "TLC Taxi Zone in which the trip ended"
+
+      - name: affiliated_base_number
+        description: "Base Number that a taxi is registered with or operates from"
+
+      - name: filename
+        description: ""
+
+  - name: stg__fhvhv_tripdata
+    description: "High Volume FHV trip data in New York City"
+    columns:
+      - name: hvfhs_license_num
+        description: "The TLC license number of the HVFHS base or business
+                          As of September 2019, the HVFHS licensees are the following:
+                          • HV0002: Juno
+                          • HV0003: Uber
+                          • HV0004: Via
+                          • HV0005: Lyft"
+
+      - name: dispatching_base_num
+        description: "The TLC Base License Number of the base that dispatched the trip"
+
+      - name: originating_base_num
+        description: "base number of the base that received the original trip request"
+
+      - name: request_datetime
+        description: "date/time when passenger requested to be picked up"
+
+      - name: on_scene_datetime
+        description: "date/time when driver arrived at the pick-up location (Accessible Vehicles-only)"
+
+      - name: pickup_datetime
+        description: "The date and time of the trip pick-up"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist  
+
+      - name: dropoff_datetime
+        description: "The date and time of the trip drop-off"
+        tests:
+          - dbt_expectations.expect_column_to_exist
+
+      - name: pulocationid
+        description: "TLC Taxi Zone in which the trip began"
+
+      - name: dolocationid
+        description: "TLC Taxi Zone in which the trip ended"
+
+      - name: trip_miles
+        description: "total miles for passenger trip"
+
+      - name: trip_time
+        description: "total time in seconds for passenger trip"
+
+      - name: base_passenger_fare
+        description: "base passenger fare before tolls, tips, taxes, and fees"
+
+      - name: tolls
+        description: "total amount of all tolls paid in trip"
+
+      - name: bcf
+        description: "total amount collected in trip for Black Car Fund"
+
+      - name: sales_tax
+        description: "total amount collected in trip for NYS sales tax"
+
+      - name: congestion_surcharge
+        description: "total amount collected in trip for NYS congestion surcharge"
+
+      - name: airport_fee
+        description: "$2.50 for both drop off and pick up at LaGuardia, Newark, and John F. Kennedy airports"
+
+      - name: tips
+        description: "total amount of tips received from passenger"
+
+      - name: driver_pay
+        description: "total driver pay (not including tolls or tips and net of commission, surcharges, or taxes)"
+
+      - name: shared_request_flag
+        description: "Did the passenger agree to a shared/pooled ride, regardless of whether they were matched? (Y/N)"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: boolean
+
+      - name: shared_match_flag
+        description: "Did the passenger share the vehicle with another passenger who booked separately at any point during the trip? (Y/N)"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: boolean
+
+      - name: access_a_ride_flag
+        description: "Was the trip administered on behalf of the Metropolitan Transportation Authority (MTA)? (Y/N)"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: boolean
+
+      - name: wav_request_flag
+        description: "Did the passenger request a wheelchair-accessible vehicle (WAV)? (Y/N)"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: boolean
+
+      - name: wav_match_flag
+        description: "Did the trip occur in a wheelchair-accessible vehicle (WAV)? (Y/N)"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: boolean
+
+      - name: filename
+        description: ""
+
+  - name: stg__green_tripdata
+    description: "Green taxi trip data records"
+    columns:
+      - name: vendorid
+        description: "A code indicating the LPEP provider that provided the record
+                      • 1= Creative Mobile Technologies, LLC;
+                      • 2= VeriFone Inc."
+
+      - name: lpep_pickup_datetime
+        description: "The date and time when the meter was engaged"
+
+      - name: lpep_dropoff_datetime
+        description: "The date and time when the meter was disengaged"
+
+      - name: store_and_fwd_flag
+        description: "This flag indicates whether the trip record was held in vehicle 
+                      memory before sending to the vendor, aka 'store and forward,' 
+                      because the vehicle did not have a connection to the server.
+                      Y= store and forward trip
+                      N= not a store and forward trip"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: boolean
+          
+
+      - name: ratecodeid
+        description: "The final rate code in effect at the end of the trip.
+                      • 1: Satndard rate
+                      • 2: JFK
+                      • 3: Newark
+                      • 4: Nassau or Westchester
+                      • 5: Negotiated fare
+                      • 6: Group ride"
+
+      - name: pulocationid
+        description: "TLC Taxi Zone in which the taximeter was engaged"
+
+      - name: dolocationid
+        description: "TLC Taxi Zone in which the taximeter was disengaged"
+
+      - name: passenger_count
+        description: "The number of passengers in the vehicle"
+
+      - name: trip_distance
+        description: "The elapsed trip distance in miles reported by the taximeter"
+
+      - name: fare_amount
+        description: "The time-and-distance fare calculated by the meter"
+
+      - name: extra
+        description: "Miscellaneous extras and surcharges. Currently, this only includes 
+                      the $0.50 and $1 rush hour and overnight charges."
+
+      - name: mta_tax
+        description: "$0.50 MTA tax that is automatically triggered based on the metered 
+                      rate in use"
+
+      - name: tip_amount
+        description: "This field is automatically populated for credit card 
+                      tips. Cash tips are not included"
+
+      - name: tolls_amount
+        description: "Total amount of all tolls paid in trip"
+
+      - name: improvement_surcharge
+        description: "$0.30 improvement surcharge assessed on hailed trips at the flag
+                      drop. The improvement surcharge began being levied in 2015."
+
+
+      - name: total_amount
+        description: "The total amount charged to passengers. Does not include cash tips"
+
+      - name: payment_type
+        description: "A numeric code signifying how the passenger paid for the trip."
+
+      - name: trip_type
+        description: "A code indicating whether the trip was a street-hail or a dispatch
+                      that is automatically assigned based on the metered rate in use but 
+                      can be altered by the driver.
+                      • 1: Street-hail
+                      • 2: Dispatch"
+
+      - name: congestion_surcharge
+        description: "Amount collected in trip for congestion surcharge."
+
+      - name: filename
+        description: ""
+
+  - name: stg__yellow_tripdata
+    description: ""
+    columns:
+      - name: vendorid
+        description: "A code indicating the LPEP provider that provided the record
+                      • 1= Creative Mobile Technologies, LLC;
+                      • 2= VeriFone Inc."
+
+      - name: tpep_pickup_datetime
+        description: "The date and time when the meter was engaged"
+
+      - name: tpep_dropoff_datetime
+        description: "The date and time when the meter was disengaged"
+
+      - name: passenger_count
+        description: "The number of passengers in the vehicle"
+
+      - name: trip_distance
+        description: "The elapsed trip distance in miles reported by the taximeter"
+
+      - name: ratecodeid
+        description: "The final rate code in effect at the end of the trip.
+                      • 1: Satndard rate
+                      • 2: JFK
+                      • 3: Newark
+                      • 4: Nassau or Westchester
+                      • 5: Negotiated fare
+                      • 6: Group ride"
+
+      - name: store_and_fwd_flag
+        description: "This flag indicates whether the trip record was held in vehicle 
+                      memory before sending to the vendor, aka 'store and forward,' 
+                      because the vehicle did not have a connection to the server.
+                      Y= store and forward trip
+                      N= not a store and forward trip"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: boolean
+
+      - name: pulocationid
+        description: "TLC Taxi Zone in which the taximeter was engaged"
+
+      - name: dolocationid
+        description: "TLC Taxi Zone in which the taximeter was disengaged"
+
+      - name: payment_type
+        description: "A numeric code signifying how the passenger paid for the trip
+                      • 1: Credit Card
+                      • 2: Cash
+                      • 3: No charge
+                      • 4: Dispute
+                      • 5: Unknown
+                      • 6: Voided trip"
+
+      - name: fare_amount
+        description: "The time-and-distance fare calculated by the meter"
+
+      - name: extra
+        description: "Miscellaneous extras and surcharges. Currently, this only includes 
+                      the $0.50 and $1 rush hour and overnight charges."
+
+      - name: mta_tax
+        description: "$0.50 MTA tax that is automatically triggered based on the metered 
+                      rate in use"
+
+      - name: tip_amount
+        description: "This field is automatically populated for credit card tips. 
+                      Cash tips are not included."
+
+      - name: tolls_amount
+        description: "Total amount of all tolls paid in trip."
+
+      - name: improvement_surcharge
+        description: "$0.30 improvement surcharge assessed trips at the flag drop.
+                      The improvement surcharge began being levied in 2015."
+
+      - name: total_amount
+        description: The total amount charged to passengers. Does not include cash tips."
+
+      - name: congestion_surcharge
+        description: "Total amount collected in trip for NYS congestion surcharge"
+
+      - name: airport_fee
+        description: "$1.25 for pick up only at LaGuardia and John F. Kennedy Airports"
+
+      - name: filename
+        description: ""
