@@ -4,7 +4,6 @@ with source as (
 
 ),
 
--- select the data and change them to the correct type
 renamed as (
 
     select
